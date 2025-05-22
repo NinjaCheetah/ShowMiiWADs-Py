@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>858</width>
+    <width>1045</width>
     <height>545</height>
    </rect>
   </property>
@@ -18,12 +18,21 @@
     <item>
      <layout class="QVBoxLayout" name="main_layout">
       <item>
-       <widget class="QTableWidget" name="tableWidget">
-        <attribute name="horizontalHeaderCascadingSectionResizes">
+       <widget class="QTableWidget" name="wad_table">
+        <property name="editTriggers">
+         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+        </property>
+        <property name="showGrid">
          <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>75</number>
+        </property>
+        <property name="cornerButtonEnabled">
+         <bool>false</bool>
+        </property>
+        <attribute name="horizontalHeaderHighlightSections">
+         <bool>false</bool>
         </attribute>
         <column>
          <property name="text">
@@ -37,7 +46,7 @@
         </column>
         <column>
          <property name="text">
-          <string>Channel Title</string>
+          <string>Channel Name</string>
          </property>
         </column>
         <column>
@@ -47,12 +56,12 @@
         </column>
         <column>
          <property name="text">
-          <string>Blocks</string>
+          <string>Version</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Version</string>
+          <string>Blocks</string>
          </property>
         </column>
         <column>
@@ -62,22 +71,17 @@
         </column>
         <column>
          <property name="text">
-          <string>IOS Flag (?)</string>
+          <string>IOS</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Region Flag</string>
+          <string>Region</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Content</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Path</string>
+          <string>Contents</string>
          </property>
         </column>
        </widget>
@@ -91,12 +95,73 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>858</width>
-     <height>21</height>
+     <width>1045</width>
+     <height>30</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="file_recent_folders">
+     <property name="title">
+      <string>Recent Folders</string>
+     </property>
+     <addaction name="action_placeholder_none"/>
+    </widget>
+    <addaction name="file_open_folder"/>
+    <addaction name="file_export"/>
+    <addaction name="file_refresh"/>
+    <addaction name="separator"/>
+    <addaction name="file_recent_folders"/>
+    <addaction name="separator"/>
+    <addaction name="file_exit"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="file_open_folder">
+   <property name="text">
+    <string>Open Folder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="file_exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>test</string>
+   </property>
+  </action>
+  <action name="action_placeholder_none">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>None</string>
+   </property>
+  </action>
+  <action name="file_export">
+   <property name="text">
+    <string>Export to File</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="file_refresh">
+   <property name="text">
+    <string>Refresh Folder</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
