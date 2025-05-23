@@ -30,10 +30,14 @@ jobs:
       run: rustup update
     - name: Install Dependencies
       run: |
+        python -m venv .venv
+        source ./.venv/bin/activate
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Build Package
-      run: make all
+      run: |
+        source ./.venv/bin/activate
+        make all
     - name: Prepare Package for Upload
       run: |
         mv ShowMiiWADs-Py ~/ShowMiiWADs-Py
@@ -61,10 +65,14 @@ jobs:
         run: rustup target add x86_64-apple-darwin
       - name: Install Dependencies
         run: |
+          python -m venv .venv
+          source ./.venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Build Package
-        run: ARCH_FLAGS=--macos-target-arch=x86_64 make all
+        run: |
+          source ./.venv/bin/activate
+          ARCH_FLAGS=--macos-target-arch=x86_64 make all
       - name: Prepare Package for Upload
         run: |
           mv ShowMiiWADs-Py.app ~/ShowMiiWADs-Py.app
@@ -92,10 +100,14 @@ jobs:
         run: rustup target add aarch64-apple-darwin
       - name: Install Dependencies
         run: |
+          python -m venv .venv
+          source ./.venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Build Package
-        run: ARCH_FLAGS=--macos-target-arch=arm64 make all
+        run: |
+          source ./.venv/bin/activate
+          ARCH_FLAGS=--macos-target-arch=arm64 make all
       - name: Prepare Package for Upload
         run: |
           mv ShowMiiWADs-Py.app ~/ShowMiiWADs-Py.app
@@ -123,10 +135,14 @@ jobs:
       run: rustup update
     - name: Install Dependencies
       run: |
+        python -m venv .venv
+        .\.venv\Scripts\activate
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Build Package
-      run: .\Build.ps1
+      run: |
+        .\.venv\Scripts\activate
+        .\Build.ps1
     - name: Upload Package
       uses: actions/upload-artifact@v4
       with:
