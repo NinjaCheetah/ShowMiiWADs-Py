@@ -3,6 +3,7 @@ ARCH_FLAGS?=
 
 all:
 	# python build_translations.py
+	cd rust_modules && python -m maturin develop --release
 	$(CC) --show-progress --assume-yes-for-downloads ShowMiiWADs-Py.py $(ARCH_FLAGS) -o ShowMiiWADs-Py
 
 install:

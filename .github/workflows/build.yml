@@ -1,0 +1,139 @@
+# This workflow will install Python dependencies and then build ShowMiiWADs-Py for all platforms
+
+name: Build ShowMiiWADs-Py
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-linux-x86_64:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install ccache for Nuitka
+      run: |
+        sudo apt update && \
+        sudo apt install -y ccache patchelf
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Update Rust Toolchain
+      run: rustup update
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Build Package
+      run: make all
+    - name: Prepare Package for Upload
+      run: |
+        mv ShowMiiWADs-Py ~/ShowMiiWADs-Py
+        cd ~
+        tar cvf ShowMiiWADs-Py.tar ShowMiiWADs-Py
+    - name: Upload Package
+      uses: actions/upload-artifact@v4
+      with:
+        path: ~/ShowMiiWADs-Py.tar
+        name: ShowMiiWADs-Py-Linux-bin
+
+  build-macos-x86:
+
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Update Rust Toolchain
+        run: rustup update
+      - name: Set x86_64 Rust Target
+        run: rustup target add x86_64-apple-darwin
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build Package
+        run: ARCH_FLAGS=--macos-target-arch=x86_64 make all
+      - name: Prepare Package for Upload
+        run: |
+          mv ShowMiiWADs-Py.app ~/ShowMiiWADs-Py.app
+          cd ~
+          tar cvf ShowMiiWADs-Py.tar ShowMiiWADs-Py.app
+      - name: Upload Package
+        uses: actions/upload-artifact@v4
+        with:
+          path: ~/ShowMiiWADs-Py.tar
+          name: ShowMiiWADs-Py-macOS-x86_64-bin
+
+  build-macos-arm64:
+
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Update Rust Toolchain
+        run: rustup update
+      - name: Set ARM64 Rust Target
+        run: rustup target add aarch64-apple-darwin
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build Package
+        run: ARCH_FLAGS=--macos-target-arch=arm64 make all
+      - name: Prepare Package for Upload
+        run: |
+          mv ShowMiiWADs-Py.app ~/ShowMiiWADs-Py.app
+          cd ~
+          tar cvf ShowMiiWADs-Py.tar ShowMiiWADs-Py.app
+      - name: Upload Package
+        uses: actions/upload-artifact@v4
+        with:
+          path: ~/ShowMiiWADs-Py.tar
+          name: ShowMiiWADs-Py-macOS-arm64-bin
+
+  build-windows-x86_64:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Enable Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1.13.0
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Update Rust Toolchain
+      run: rustup update
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Build Package
+      run: .\Build.ps1
+    - name: Upload Package
+      uses: actions/upload-artifact@v4
+      with:
+        path: D:\a\ShowMiiWADs-Py\ShowMiiWADs-Py\ShowMiiWADs-Py.dist
+        name: ShowMiiWADs-Py-Windows-bin
+    - name: Upload Onefile Package
+      uses: actions/upload-artifact@v4
+      with:
+        path: D:\a\ShowMiiWADs-Py\ShowMiiWADs-Py\ShowMiiWADs-Py.exe
+        name: ShowMiiWADs-Py-Windows-onefile-bin
