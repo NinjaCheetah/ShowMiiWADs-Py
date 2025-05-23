@@ -51,7 +51,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: ~/ShowMiiWADs-Py.tar
-        name: ShowMiiWADs-Py-Linux-bin
+        name: ShowMiiWADs-Py-Linux-x86_64-bin
 
   build-macos-x86:
 
@@ -168,4 +168,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: D:\a\ShowMiiWADs-Py\ShowMiiWADs-Py\ShowMiiWADs-Py.exe
-        name: ShowMiiWADs-Py-Windows-onefile-bin
+        name: ShowMiiWADs-Py-Windows-x86_64-onefile-bin
