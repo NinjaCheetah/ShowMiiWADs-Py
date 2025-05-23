@@ -117,7 +117,15 @@
     <addaction name="separator"/>
     <addaction name="file_exit"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="tools_lz77_compress"/>
+    <addaction name="tools_lz77_decompress"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="file_open_folder">
@@ -160,6 +168,16 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="tools_lz77_compress">
+   <property name="text">
+    <string>LZ77 Compress</string>
+   </property>
+  </action>
+  <action name="tools_lz77_decompress">
+   <property name="text">
+    <string>LZ77 Decompress</string>
    </property>
   </action>
  </widget>

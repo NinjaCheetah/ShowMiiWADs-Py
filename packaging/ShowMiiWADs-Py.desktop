@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=ShowMiiWADs-Py
+Exec=/opt/ShowMiiWADs-Py/ShowMiiWADs-Py.bin %U
+Terminal=false
+Type=Application
+Icon=/opt/ShowMiiWADs-Py/ShowMiiWADs-Py.png
+StartupWMClass=ShowMiiWADs-Py
+Comment=A WIP clone of ShowMiiWADs
+Categories=Utility;

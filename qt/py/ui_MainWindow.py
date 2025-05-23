@@ -38,6 +38,10 @@ class Ui_MainWindow(object):
         self.file_export.setObjectName(u"file_export")
         self.file_refresh = QAction(MainWindow)
         self.file_refresh.setObjectName(u"file_refresh")
+        self.tools_lz77_compress = QAction(MainWindow)
+        self.tools_lz77_compress.setObjectName(u"tools_lz77_compress")
+        self.tools_lz77_decompress = QAction(MainWindow)
+        self.tools_lz77_decompress.setObjectName(u"tools_lz77_decompress")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout_2 = QVBoxLayout(self.centralwidget)
@@ -87,12 +91,15 @@ class Ui_MainWindow(object):
         self.menuFile.setObjectName(u"menuFile")
         self.file_recent_folders = QMenu(self.menuFile)
         self.file_recent_folders.setObjectName(u"file_recent_folders")
+        self.menuTools = QMenu(self.menubar)
+        self.menuTools.setObjectName(u"menuTools")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuTools.menuAction())
         self.menuFile.addAction(self.file_open_folder)
         self.menuFile.addAction(self.file_export)
         self.menuFile.addAction(self.file_refresh)
@@ -101,6 +108,8 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.file_exit)
         self.file_recent_folders.addAction(self.action_placeholder_none)
+        self.menuTools.addAction(self.tools_lz77_compress)
+        self.menuTools.addAction(self.tools_lz77_decompress)
 
         self.retranslateUi(MainWindow)
 
@@ -124,6 +133,8 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.file_refresh.setShortcut(QCoreApplication.translate("MainWindow", u"F5", None))
 #endif // QT_CONFIG(shortcut)
+        self.tools_lz77_compress.setText(QCoreApplication.translate("MainWindow", u"LZ77 Compress", None))
+        self.tools_lz77_decompress.setText(QCoreApplication.translate("MainWindow", u"LZ77 Decompress", None))
         ___qtablewidgetitem = self.wad_table.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Filename", None));
         ___qtablewidgetitem1 = self.wad_table.horizontalHeaderItem(1)
@@ -146,5 +157,6 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem9.setText(QCoreApplication.translate("MainWindow", u"Contents", None));
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.file_recent_folders.setTitle(QCoreApplication.translate("MainWindow", u"Recent Folders", None))
+        self.menuTools.setTitle(QCoreApplication.translate("MainWindow", u"Tools", None))
     # retranslateUi
 

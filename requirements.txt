@@ -2,3 +2,4 @@ pyside6
 nuitka~=2.6.0
 libWiiPy
 zstandard
+maturin

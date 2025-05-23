@@ -1,0 +1,3 @@
+[submodule "rust_modules/rustii"]
+	path = rust_modules/rustii
+	url = https://github.com/NinjaCheetah/rustii

@@ -24,11 +24,11 @@ share/python-wheels/
 *.egg-info/
 main.build/
 main.dist/
-NUSGet.build/
-NUSGet.dist/
-NUSGet.onefile-build/
-NUSGet
-NUSGet.app/
+ShowMiiWADs-Py.build/
+ShowMiiWADs-Py.dist/
+ShowMiiWADs-Py.onefile-build/
+ShowMiiWADs-Py
+ShowMiiWADs-Py.app/
 .installed.cfg
 *.egg
 MANIFEST

@@ -1,16 +1,62 @@
 # "ShowMiiWADs-Py.py" licensed under the MIT license
 # Copyright 2025 NinjaCheetah and Contributors
 
-import re
+# Nuitka options. These determine compilation settings based on the current OS.
+# nuitka-project-if: {OS} == "Darwin":
+#    nuitka-project: --standalone
+#    nuitka-project: --macos-create-app-bundle
+#    nuitka-project: --macos-app-icon={MAIN_DIRECTORY}/resources/icon.png
+# nuitka-project-if: {OS} == "Windows":
+#    nuitka-project: --onefile
+#    nuitka-project: --windows-icon-from-ico={MAIN_DIRECTORY}/resources/icon.png
+#    nuitka-project: --windows-console-mode=disable
+# nuitka-project-if: {OS} in ("Linux", "FreeBSD", "OpenBSD"):
+#    nuitka-project: --onefile
+
+# These are standard options that are needed on all platforms.
+# nuitka-project: --plugin-enable=pyside6
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/resources=resources
+
 import sys
 
 from PySide6.QtGui import QIcon, QAction
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog, QListView, QLabel, QTableWidgetItem
-from PySide6.QtCore import QRunnable, Slot, QThreadPool, Signal, QObject, QLibraryInfo, QTranslator, QLocale
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog, QListView, QLabel, QTableWidgetItem, \
+    QProgressBar
+from PySide6.QtCore import Qt, QRunnable, Slot, QThreadPool, Signal, QObject, QLibraryInfo, QTranslator, QLocale
 
 from qt.py.ui_MainWindow import Ui_MainWindow
+from modules.lz77 import *
 from modules.config import *
 from modules.coredata import *
+
+
+class WorkerSignals(QObject):
+    result = Signal(object)
+    progress = Signal(str)
+
+
+class Worker(QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()
+
+        self.kwargs['progress_callback'] = self.signals.progress
+
+    @Slot()
+    def run(self):
+        # All possible errors *should* be caught by the code and will safely return specific error codes. In the
+        # unlikely event that an unexpected error happens, it can only possibly be a ValueError, so handle that and
+        # return code 1.
+        # I have no idea if this above comment is true outside of NUSGet yet^
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except ValueError:
+            self.signals.result.emit(1)
+        else:
+            self.signals.result.emit(result)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -18,15 +64,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.threadpool = QThreadPool()
         self.ui.file_count_lbl = QLabel("Files: 0")
         self.ui.folder_count_lbl = QLabel("Folders: 0")
+        self.ui.status_progressbar = QProgressBar()
+        self.ui.status_progressbar.setMaximumWidth(200)
+        self.ui.status_lbl = QLabel()
         self.folder_actions = []
         self.ui.statusbar.addWidget(self.ui.file_count_lbl)
         self.ui.statusbar.addWidget(self.ui.folder_count_lbl)
+        self.ui.statusbar.addPermanentWidget(self.ui.status_lbl)
+        self.ui.statusbar.addPermanentWidget(self.ui.status_progressbar)
+        # =========
+        # File Menu
+        # =========
         self.ui.file_open_folder.triggered.connect(self.add_folder)
         self.ui.file_export.triggered.connect(self.export_wad_info)
         self.ui.file_refresh.triggered.connect(self.load_folder)
         self.ui.file_exit.triggered.connect(self.close)
+        # ==========
+        # Tools Menu
+        # ==========
+        self.ui.tools_lz77_compress.triggered.connect(self.tools_lz77_compress)
+        self.ui.tools_lz77_decompress.triggered.connect(self.tools_lz77_decompress)
         if "folder_paths" in config_data.keys() and len(config_data["folder_paths"]) > 0:
             self.load_folder()
             self.ui.folder_count_lbl.setText(f"Folders: {len(config_data["folder_paths"])}")
@@ -95,6 +155,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def export_wad_info(self):
         file_name, _ = QFileDialog.getSaveFileName(self, "Export WAD Info to CSV", "", "CSV Files (*.csv)")
+        if file_name == "":
+            return
         file_path = pathlib.Path(file_name).with_suffix(".csv")
         out_text = "Filename,Type,Channel Name,ASCII TID,Version,Size Blocks,Size MB,IOS,Region,Contents\n"
         for row in range(0, self.ui.wad_table.rowCount()):
@@ -102,6 +164,60 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 out_text += f"{self.ui.wad_table.item(row, i).text()},"
             out_text += "\n"
         open(file_path, "w").write(out_text)
+
+    def tools_lz77_compress(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, "Select a File to Compress", "")
+        if file_name == "":
+            return
+        file_path = pathlib.Path(file_name)
+        # Outsource to Rust because the Python implementation is uselessly slow. Also outsource that to a thread so the
+        # UI doesn't die.
+        self.ui.status_lbl.setText(f"Compressing {file_path.name}...")
+        self.ui.status_progressbar.setRange(0, 0)
+        worker = Worker(compress_lz77, file_path)
+        worker.signals.result.connect(self.callback_lz77_compress_done)
+        self.threadpool.start(worker)
+
+    def callback_lz77_compress_done(self, file_path):
+        self.ui.status_lbl.clear()
+        self.ui.status_progressbar.setRange(0, 100)
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Icon.Information)
+        msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        msg_box.setDefaultButton(QMessageBox.StandardButton.Ok)
+        msg_box.setWindowTitle("File Compressed Successfully")
+        msg_box.setText("<b>The file has successfully been compressed!</b>")
+        msg_box.setInformativeText(f"The compressed file was saved to {file_path.with_suffix('.lz77')}.")
+        msg_box.exec()
+
+    def tools_lz77_decompress(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, "Select a File to Decompress", "")
+        if file_name == "":
+            return
+        file_path = pathlib.Path(file_name)
+        self.ui.status_lbl.setText(f"Decompressing {file_path.name}...")
+        self.ui.status_progressbar.setRange(0, 0)
+        worker = Worker(decompress_lz77, file_path)
+        worker.signals.result.connect(self.callback_lz77_decompress_done)
+        self.threadpool.start(worker)
+
+    def callback_lz77_decompress_done(self, file_path):
+        msg_box = QMessageBox()
+        msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        msg_box.setDefaultButton(QMessageBox.StandardButton.Ok)
+        self.ui.status_lbl.clear()
+        self.ui.status_progressbar.setRange(0, 100)
+        if not file_path:
+            msg_box.setIcon(QMessageBox.Icon.Critical)
+            msg_box.setWindowTitle("Could Not Decompress File")
+            msg_box.setText("<b>The specified file could not be decompressed!</b>")
+            msg_box.setInformativeText(f"Please make sure that you have selected an LZ77-compressed file.")
+        else:
+            msg_box.setIcon(QMessageBox.Icon.Information)
+            msg_box.setWindowTitle("File Decompressed Successfully")
+            msg_box.setText("<b>The file has successfully been decompressed!</b>")
+            msg_box.setInformativeText(f"The decompressed file was saved to {file_path.with_suffix('.out')}.")
+        msg_box.exec()
 
 
 if __name__ == "__main__":

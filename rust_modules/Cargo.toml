@@ -1,0 +1,14 @@
+[package]
+name = "rust_modules"
+version = "0.1.0"
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "rust_modules"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.25", features = ["extension-module"] }
+hex = "0"
+rustii = { path = "./rustii" }
