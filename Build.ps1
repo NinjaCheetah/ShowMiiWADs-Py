@@ -5,25 +5,25 @@ param(
     [string]$Task = "build"
 )
 
-$buildShowMiiWADs-Py = {
+$buildShowMiiWADsPy = {
     Write-Host "Building ShowMiiWADs-Py..."
     # python build_translations.py
     cd rust_modules && python -m maturin develop --release
     python -m nuitka --show-progress --assume-yes-for-downloads ShowMiiWADs-Py.py
 }
 
-$cleanShowMiiWADs-Py = {
+$cleanShowMiiWADsPy = {
     Write-Host "Cleaning..."
     Remove-Item -Recurse -Force ShowMiiWADs-Py.exe, ./ShowMiiWADs-Py.build/, ./ShowMiiWADs-Py.dist/, ./ShowMiiWADs-Py.onefile-build/
 }
 
 switch ($Task.ToLower()) {
     "build" {
-        & $buildShowMiiWADs-Py
+        & $buildShowMiiWADsPy
         break
     }
     "clean" {
-        & $cleanShowMiiWADs-Py
+        & $cleanShowMiiWADsPy
         break
     }
     default {
