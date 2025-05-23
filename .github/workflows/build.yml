@@ -18,6 +18,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Update Submodules
+      run: |
+        git submodule init
+        git submodule update
     - name: Install ccache for Nuitka
       run: |
         sudo apt update && \
@@ -55,6 +59,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Update Submodules
+        run: |
+          git submodule init
+          git submodule update
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -90,6 +98,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Update Submodules
+        run: |
+          git submodule init
+          git submodule update
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -125,6 +137,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Update Submodules
+      run: |
+        git submodule init
+        git submodule update
     - name: Enable Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1.13.0
     - name: Set up Python 3.12
